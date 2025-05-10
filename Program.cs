@@ -31,11 +31,25 @@ static void AddNote(NoteAppDbContext db)
     db.Notes.Add(note);
     db.SaveChanges();
     Console.WriteLine("✅ Note Added!");
+
+    string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+
+    string folderPath = Path.Combine(desktopPath, "MyNotes");
+    Directory.CreateDirectory(folderPath);
+
+    string saveNote = Path.Combine(folderPath, "SaveNoteStorage.txt");
+
+    string textToSave = $"[{DateTime.Now:g}] {enterTitle}\n{content}\n---\n";
+    File.AppendAllText(saveNote, textToSave);
+
+    Console.WriteLine($"💾 Note saved in: {saveNote}");
+
 }
 
 static void ViewNote(NoteAppDbContext db)
 {
     var notes = db.Notes.OrderByDescending(e => e.CreatedAt).ToList();
+
 
     if (!notes.Any())
     {
@@ -45,7 +59,7 @@ static void ViewNote(NoteAppDbContext db)
 
     foreach (var note in notes)
     {
-        Console.WriteLine($"\n🗒️ {note.Id} - {note.Title} ({note.CreatedAt:g})");
+        Console.WriteLine($"\n🗒️ {note.Id} - {note.Title} ({note.CreatedAt:g}])");
         Console.WriteLine(note.Content);
     }
 }
